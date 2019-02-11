@@ -1,19 +1,46 @@
 % %% Generate weakly stationary paths
-% clear; clc;
-% rng(2018)
-% % define simulation parameters
-% n_clusters = 5;
-% obs_num_per_cluster = 10;
-% H = -0.4:0.2:0.4;
-% total_time_steps = 100;
-% obs_num_per_step = 3;
-% total_num_observations = total_time_steps * obs_num_per_step;
-% total_num_paths = 100;
-% 
-% % simulation weakly stationary stochastic processes
-% [obs_chain, cluster_ind] = sim_wssp_paths(n_clusters, obs_num_per_cluster, H, ...
-%                          total_num_observations, total_num_paths);
-% save('mBm.mat')
+clear; clc;
+rng(2018,'v5uniform')
+% define simulation parameters
+n_clusters = 5;
+obs_num_per_cluster = 10;
+H = 0.3:0.1:0.7;
+total_time_steps = 100;
+obs_num_per_step = 3;
+total_num_observations = total_time_steps * obs_num_per_step;
+total_num_paths = 100;
+
+% simulation weakly stationary stochastic processes
+[obs_chain_raw, cluster_ind] = sim_wssp_paths(n_clusters, obs_num_per_cluster, H, ...
+                         total_num_observations, total_num_paths);
+save('fBm.mat')
+
+% Lamperti transformation
+time_steps = linspace(0, 1, total_num_observations);
+obs_chain = obs_chain_raw;
+delta_t = 1 / total_num_observations;
+base = 1 / 2;
+ind = 1:total_num_observations;
+
+for z = 1:size(obs_chain, 3) % scenario
+    for j = 1:size(obs_chain, 2) % path
+        for i = 1:size(obs_chain, 1)
+            t = base^time_steps(i);
+            [~, t_ind] = min(abs(time_steps - t));
+            
+            t_dt = base^(time_steps(i) + delta_t);
+            [~, t_dt_ind] = min(abs(time_steps - t));
+            
+            t_2dt = base^(time_steps(i) + 2 * delta_t);
+            [~, t_2dt_ind] = min(abs(time_steps - t));
+            
+            obs_chain(i, j, z) = sign_log(obs_chain_raw(t_2dt_ind, j, z) ...
+                * obs_chain_raw(t_ind, j, z) ...
+                / obs_chain_raw(t_dt_ind, j, z)^2);
+        end
+    end
+end
+
                      
 % %% Offline dataset experiments
 test_time_steps = 15; 

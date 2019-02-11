@@ -47,11 +47,8 @@ obs = zeros(num_points_one_path, sum(obs_num_clusters), num_sim_paths);
 % generate weakly stationary process
 for i = 1:num_sim_paths
     for z = 1:sum(obs_num_clusters)
-        % first order difference of mBm paths
-        Hfunc = @(t) 0.5+H(cluster_ind(z))*t;
-        t = linspace(0,1,num_points_one_path);
-        obs(2:end, z, i) = diff(mbmlevinson(num_points_one_path,Hfunc(t)), 1);
-        % obs(2:end, z, i) = diff(fbmlevinson(num_points_one_path, H(cluster_ind(z))), 1);
+        % first order difference of fBm paths
+        obs(2:end, z, i) = diff(fbmlevinson(num_points_one_path, H(cluster_ind(z))), 1);
     end
 end
 % end of function
