@@ -29,10 +29,10 @@ for z = 1:size(obs_chain, 3) % scenario
             [~, t_ind] = min(abs(time_steps - t));
             
             t_dt = base^(time_steps(i) + delta_t);
-            [~, t_dt_ind] = min(abs(time_steps - t));
+            [~, t_dt_ind] = min(abs(time_steps - t_dt));
             
             t_2dt = base^(time_steps(i) + 2 * delta_t);
-            [~, t_2dt_ind] = min(abs(time_steps - t));
+            [~, t_2dt_ind] = min(abs(time_steps - t_2dt));
             
             obs_chain(i, j, z) = sign_log(obs_chain_raw(t_2dt_ind, j, z) ...
                 * obs_chain_raw(t_ind, j, z) ...
